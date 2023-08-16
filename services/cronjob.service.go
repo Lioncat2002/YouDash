@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -44,6 +45,14 @@ func YouTubeCronJob() {
 		snippet := v["snippet"].(map[string]interface{})
 		thumbnails := snippet["thumbnails"].(map[string]interface{})
 		def := thumbnails["default"].(map[string]interface{})
+		resp, err := http.Get("http://localhost:8080/api/video/" + id["videoId"].(string))
+		if err != nil {
+			log.Println("Error fetching from backend", err)
+		}
+		if !strings.Contains(resp.Status, "400") {
+			log.Println("Skipping ", id["videoId"])
+			continue
+		}
 		value := map[string]interface{}{
 			"title":     snippet["title"],
 			"desc":      snippet["description"],

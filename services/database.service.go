@@ -1,9 +1,9 @@
 package services
 
 import (
+	"famtask/models"
 	"log"
 	"os"
-	"famtask/models"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
@@ -24,9 +24,6 @@ func ConnectDatabase() {
 	} else {
 		log.Println("connected to database")
 	}
-	//DB.Statement.Delete(&models.User{}, &models.Post{})
-	//DB.Exec("DELETE FROM items")
-	//DB.Exec("DELETE FROM users")
-	//DB.Delete(&[]models.User{}, &[]models.Post{}).Where("1=1")
+	//DB.Exec("DELETE FROM videos")
 	DB.AutoMigrate(&models.Video{})
 }

@@ -13,4 +13,5 @@ type Video struct {
 	PubDate  time.Time
 	ThumbUrl string
 	Url      string
+	VideoId  string
 }

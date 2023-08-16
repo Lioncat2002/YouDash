@@ -12,7 +12,7 @@ func main() {
 	services.ConnectDatabase()
 	router := gin.Default()
 	crn := cron.New()
-	crn.AddFunc("*/15 * * * *", services.YouTubeCronJob)
+	crn.AddFunc("*/3 * * * *", services.YouTubeCronJob)
 	crn.Start()
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
@@ -22,6 +22,7 @@ func main() {
 
 	VideoRoute := router.Group("/api/video")
 	VideoRoute.GET("/", controllers.GetAllVideo)
+	VideoRoute.GET("/:id", controllers.GetVideoById)
 	VideoRoute.POST("/", controllers.CreateMultipleVideo)
 	router.Run(":8080")
 	crn.Stop()

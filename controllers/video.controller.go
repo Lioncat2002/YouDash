@@ -3,7 +3,9 @@ package controllers
 import (
 	"famtask/models"
 	"famtask/services"
+	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -32,22 +34,41 @@ func GetAllVideo(c *gin.Context) {
 	})
 }
 
+func GetVideoById(c *gin.Context) {
+	id := c.Param("id")
+	log.Println("id", id)
+	//id, _ := strconv.ParseInt(query, 10, 32)
+	video := models.Video{}
+	if err := services.DB.Where("video_id = ?", id).First(&video).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusAccepted, gin.H{
+		"status": "success",
+		"data":   video,
+	})
+}
+
 func CreateMultipleVideo(c *gin.Context) {
-	var videoData []VideoData
-	if err := c.ShouldBindJSON(&videoData); err != nil {
+	var videoDatas []VideoData
+	if err := c.ShouldBindJSON(&videoDatas); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 	videos := []models.Video{}
-	for _, m := range videoData {
+	for _, m := range videoDatas {
 		video := models.Video{
 			Title:    m.Title,
 			Desc:     m.Desc,
 			PubDate:  m.PubDate,
 			ThumbUrl: m.ThumbUrl,
 			Url:      m.Url,
+			VideoId:  strings.Trim(m.Url, "https://youtube.com/watch?v="),
 		}
 		videos = append(videos, video)
 	}
@@ -75,6 +96,7 @@ func CreateVideo(c *gin.Context) {
 		PubDate:  videoData.PubDate,
 		ThumbUrl: videoData.ThumbUrl,
 		Url:      videoData.Url,
+		VideoId:  strings.Trim(videoData.Url, "https://youtube.com/watch?v="),
 	}
 
 	if err := services.DB.Create(&video).Error; err != nil {
