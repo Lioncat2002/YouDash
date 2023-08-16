@@ -10,11 +10,11 @@ import (
 )
 
 type VideoData struct {
-	Title    string `gorm:"size:255;"`
-	Desc     string `gorm:"size:255;"`
-	PubDate  time.Time
-	ThumbUrl string
-	Url      string
+	Title    string    `json:"title" binding:"required"`
+	Desc     string    `json:"desc" binding:"required"`
+	PubDate  time.Time `json:"pub_date" binding:"required"`
+	ThumbUrl string    `json:"thumb_url" binding:"required"`
+	Url      string    `json:"url" binding:"required"`
 }
 
 func GetAllVideo(c *gin.Context) {
@@ -30,6 +30,34 @@ func GetAllVideo(c *gin.Context) {
 		"status": "success",
 		"data":   videos,
 	})
+}
+
+func CreateMultipleVideo(c *gin.Context) {
+	var videoData []VideoData
+	if err := c.ShouldBindJSON(&videoData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	videos := []models.Video{}
+	for _, m := range videoData {
+		video := models.Video{
+			Title:    m.Title,
+			Desc:     m.Desc,
+			PubDate:  m.PubDate,
+			ThumbUrl: m.ThumbUrl,
+			Url:      m.Url,
+		}
+		videos = append(videos, video)
+	}
+
+	if err := services.DB.Create(&videos).Error; err != nil {
+		c.JSON(http.StatusConflict, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
 }
 
 func CreateVideo(c *gin.Context) {
