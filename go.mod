@@ -1,4 +1,4 @@
-module template
+module famtask
 
 go 1.21.0
 

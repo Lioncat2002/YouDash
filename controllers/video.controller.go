@@ -1,9 +1,9 @@
 package controllers
 
 import (
+	"famtask/models"
+	"famtask/services"
 	"net/http"
-	"template/models"
-	"template/services"
 	"time"
 
 	"github.com/gin-gonic/gin"

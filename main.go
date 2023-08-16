@@ -1,9 +1,14 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"famtask/controllers"
+	"famtask/services"
+
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
-
+	services.ConnectDatabase()
 	router := gin.Default()
 
 	router.GET("/", func(c *gin.Context) {
@@ -11,5 +16,8 @@ func main() {
 			"message": "Hello World!",
 		})
 	})
+
+	VideoRoute := router.Group("/api/video")
+	VideoRoute.GET("/", controllers.GetAllVideo)
 	router.Run(":8080")
 }

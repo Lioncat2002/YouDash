@@ -3,7 +3,7 @@ package services
 import (
 	"log"
 	"os"
-	"template/models"
+	"famtask/models"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
