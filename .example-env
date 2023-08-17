@@ -1,1 +1,2 @@
 DB_URI=your-postgres-link
+GCP_APIKEY="your-gcp-api-key-1 your-gcp-api-key-2 your-gcp-api-key-3"
