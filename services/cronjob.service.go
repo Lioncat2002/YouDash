@@ -12,10 +12,13 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Base Youtube data v3 API url
 const BASE_URL = "https://youtube.googleapis.com/youtube/v3/search?part=snippet&order=date&publishedAfter=2023-08-01T00%3A00%3A00Z&q=official&type=video&key="
 
+// For getting the working GCP API KEY from the multiple provided ones
 var Count = 0
 
+// Convert the string into a dynamic map
 func jsonToMap(jsonStr string) map[string]interface{} {
 	result := make(map[string]interface{})
 	json.Unmarshal([]byte(jsonStr), &result)
@@ -28,12 +31,14 @@ func YouTubeCronJob() {
 		return
 	}
 	keys := strings.Split(os.Getenv("GCP_APIKEY"), " ")
-	key := keys[Count%len(keys)]
+	key := keys[Count%len(keys)] //get the current key based on the Count
 	log.Println("Using Key: ", key)
+	//call youtube api
 	resp, err := http.Get(BASE_URL + key)
 	log.Println(resp.Status)
+	//incase the key has exceeded Quota
 	if strings.Contains(resp.Status, "403") {
-		Count += 1
+		Count += 1 //go to next provided key
 		log.Println(key, " Quota Exceeded")
 	}
 	if err != nil {
@@ -41,6 +46,7 @@ func YouTubeCronJob() {
 		return
 	}
 	defer resp.Body.Close()
+	//convert into byte[]
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println(err)
@@ -48,11 +54,12 @@ func YouTubeCronJob() {
 	}
 	sb := string(body)
 	res := jsonToMap(sb)
-	data := res["items"]
+	data := res["items"] //get the videos datas
 	var values []map[string]interface{}
 	if data != nil {
 
 		for _, v := range data.([]interface{}) {
+			// v.(map[string]interface{})  where (map[string]interface{}) for ensuring type and pleasing go compiler
 			v := v.(map[string]interface{})
 			id := v["id"].(map[string]interface{})
 			snippet := v["snippet"].(map[string]interface{})
@@ -67,6 +74,7 @@ func YouTubeCronJob() {
 				log.Println("Skipping ", id["videoId"])
 				continue
 			}
+			//turn the data into a dynamic map with schema which can be accepted by the backend
 			value := map[string]interface{}{
 				"title":     snippet["title"],
 				"desc":      snippet["description"],
@@ -81,7 +89,7 @@ func YouTubeCronJob() {
 			log.Println(err)
 			return
 		}
-
+		//send the data to the backend as a POST request
 		resp, err = http.Post("http://localhost:8080/api/video/", "application/json",
 			bytes.NewBuffer(json_data))
 		if err != nil {

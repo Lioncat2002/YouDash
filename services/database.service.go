@@ -12,6 +12,7 @@ import (
 
 var DB *gorm.DB
 
+// Database Connection
 func ConnectDatabase() {
 	err := godotenv.Load()
 	if err != nil {

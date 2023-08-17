@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// Video model
 type Video struct {
 	gorm.Model
 	Title    string `gorm:"size:255;"`
