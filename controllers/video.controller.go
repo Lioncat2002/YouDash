@@ -5,7 +5,6 @@ import (
 	"famtask/services"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +15,7 @@ type VideoData struct {
 	Desc     string    `json:"desc" binding:"required"`
 	PubDate  time.Time `json:"pub_date" binding:"required"`
 	ThumbUrl string    `json:"thumb_url" binding:"required"`
-	Url      string    `json:"url" binding:"required"`
+	VideoId  string    `json:"video_id" binding:"required"`
 }
 
 func GetAllVideo(c *gin.Context) {
@@ -64,8 +63,8 @@ func CreateMultipleVideo(c *gin.Context) {
 			Desc:     m.Desc,
 			PubDate:  m.PubDate,
 			ThumbUrl: m.ThumbUrl,
-			Url:      m.Url,
-			VideoId:  strings.Trim(m.Url, "https://youtube.com/watch?v="),
+			Url:      "https://youtube.com/watch?v=" + m.VideoId,
+			VideoId:  m.VideoId,
 		}
 		videos = append(videos, video)
 	}
@@ -92,8 +91,8 @@ func CreateVideo(c *gin.Context) {
 		Desc:     videoData.Desc,
 		PubDate:  videoData.PubDate,
 		ThumbUrl: videoData.ThumbUrl,
-		Url:      videoData.Url,
-		VideoId:  strings.Trim(videoData.Url, "https://youtube.com/watch?v="),
+		Url:      "https://youtube.com/watch?v=" + videoData.VideoId,
+		VideoId:  videoData.VideoId,
 	}
 
 	if err := services.DB.Create(&video).Error; err != nil {
