@@ -27,11 +27,8 @@ func GetAllVideo(c *gin.Context) {
 		})
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"status": "success",
-		"data":   videos,
-	})
+	model := services.DB.Model(&models.Video{})
+	c.JSON(http.StatusOK, services.PG.With(model).Request(c.Request).Response(&[]models.Video{}))
 }
 
 func GetVideoById(c *gin.Context) {

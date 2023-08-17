@@ -10,10 +10,11 @@ import (
 
 func main() {
 	services.ConnectDatabase()
+	services.InitPagination()
 	router := gin.Default()
 	crn := cron.New()
 	crn.AddFunc("*/3 * * * *", services.YouTubeCronJob)
-	crn.Start()
+	//crn.Start()
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "Hello World!",
